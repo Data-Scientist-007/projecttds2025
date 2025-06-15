@@ -1,0 +1,14 @@
+version: 1
+services:
+  - type: web
+    name: tds-virtual-ta
+    env: node
+    plan: starter
+    buildCommand: npm run render-build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+    autoDeploy: false

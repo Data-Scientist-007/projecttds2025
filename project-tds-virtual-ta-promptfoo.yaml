@@ -1,0 +1,98 @@
+description: "TDS Virtual Teaching Assistant API Evaluation"
+
+providers:
+  - id: tds-virtual-ta
+    config:
+      url: "http://localhost:3000/api/" # Replace with your deployed API URL
+      method: POST
+      headers:
+        Content-Type: application/json
+      body:
+        question: "{{vars.question}}"
+        image: "{{vars.image}}"
+
+tests:
+  - description: "GPT Model Selection Question"
+    vars:
+      question: "Should I use gpt-4o-mini which AI proxy supports, or gpt3.5 turbo?"
+    assert:
+      - type: contains-json
+        value:
+          answer: !any
+          links: !any
+      - type: javascript
+        value: |
+          const response = JSON.parse(output);
+          return response.answer.toLowerCase().includes('gpt-3.5-turbo') ||
+                 response.answer.toLowerCase().includes('specified');
+
+  - description: "Pandas Missing Values"
+    vars:
+      question: "How do I handle missing values in pandas DataFrames?"
+    assert:
+      - type: contains-json
+        value:
+          answer: !any
+          links: !any
+      - type: javascript
+        value: |
+          const response = JSON.parse(output);
+          return response.answer.toLowerCase().includes('dropna') ||
+                 response.answer.toLowerCase().includes('fillna') ||
+                 response.answer.toLowerCase().includes('missing');
+
+  - description: "Machine Learning Cross-validation"
+    vars:
+      question: "How do I implement cross-validation in scikit-learn?"
+    assert:
+      - type: contains-json
+        value:
+          answer: !any
+          links: !any
+      - type: javascript
+        value: |
+          const response = JSON.parse(output);
+          return response.answer.toLowerCase().includes('cross') ||
+                 response.answer.toLowerCase().includes('validation') ||
+                 response.answer.toLowerCase().includes('scikit');
+
+  - description: "Data Visualization"
+    vars:
+      question: "What are the best practices for creating visualizations in Python?"
+    assert:
+      - type: contains-json
+        value:
+          answer: !any
+          links: !any
+      - type: javascript
+        value: |
+          const response = JSON.parse(output);
+          return response.answer.toLowerCase().includes('matplotlib') ||
+                 response.answer.toLowerCase().includes('seaborn') ||
+                 response.answer.toLowerCase().includes('visualization');
+
+  - description: "Feature Engineering"
+    vars:
+      question: "What are the best practices for feature engineering?"
+    assert:
+      - type: contains-json
+        value:
+          answer: !any
+          links: !any
+      - type: javascript
+        value: |
+          const response = JSON.parse(output);
+          return response.answer.toLowerCase().includes('feature') ||
+                 response.answer.toLowerCase().includes('engineering') ||
+                 response.answer.toLowerCase().includes('data');
+
+defaultTest:
+  assert:
+    - type: latency
+      threshold: 30000 # 30 seconds maximum
+    - type: is-valid-json
+    - type: javascript
+      value: |
+        const response = JSON.parse(output);
+        return response.answer && typeof response.answer === 'string' &&
+               response.links && Array.isArray(response.links);
